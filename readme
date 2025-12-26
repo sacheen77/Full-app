@@ -1,0 +1,162 @@
+✅ README.md
+# Fullstack React + Node.js App on Kubernetes (Kind)
+
+This project is a complete **fullstack application** containing:
+
+- **Frontend** → React app served using **Nginx**
+- **Backend** → Node.js + Express API
+- **Kubernetes Deployment** → Multi-container pod (frontend + backend)
+- **Service** → NodePort exposing frontend & backend to localhost
+- **Kind (Kubernetes in Docker)** → Local cluster
+
+This repository is designed to help you build, containerize, deploy, and access a fullstack application using **Docker + Kubernetes + Kind**.
+
+---
+
+## 📁 Project Structure
+
+
+
+react/
+├── backend/
+│ ├── app.js
+│ ├── package.json
+│ └── Dockerfile
+├── frontend/
+│ ├── src/
+│ ├── package.json
+│ └── Dockerfile
+└── k8s/
+├── deployment.yaml
+└── service.yaml
+
+
+---
+
+# 🚀 Features
+
+- React frontend served by Nginx
+- Node.js backend with REST endpoints
+- Multi-container Kubernetes Pods
+- NodePort service exposing frontend (30080) + backend (30081)
+- Local Kind cluster (Docker-based)
+- Production-ready Dockerfiles (multi-stage for frontend)
+
+---
+
+# 🛠️ **Prerequisites**
+
+Install these tools:
+
+| Tool | Version | Link |
+|------|---------|------|
+| Docker Desktop | latest | https://www.docker.com/ |
+| kubectl | latest | https://kubernetes.io/docs/tasks/tools/ |
+| Kind | latest | https://kind.sigs.k8s.io/ |
+| Node.js | 18+ | https://nodejs.org/ |
+
+Verify installation:
+
+```powershell
+docker --version
+kubectl version --client
+kind --version
+
+📦 1. Build Backend
+
+Inside /backend:
+
+docker build -t backend-app:latest .
+
+
+Test locally (optional):
+
+docker run -d -p 5000:5000 --name backend-container backend-app:latest
+
+🎨 2. Build Frontend
+
+Inside /frontend:
+
+docker build -t frontend-app:latest .
+
+
+Test locally (optional):
+
+docker run -d -p 3000:80 --name frontend-container frontend-app:latest
+
+🚀 3. Create Kind Cluster
+kind create cluster --name fullstack-cluster
+
+
+Verify:
+
+kubectl get nodes
+
+📥 4. Load Docker Images Into Kind
+
+Kind does NOT automatically use local Docker images.
+
+kind load docker-image backend-app:latest --name fullstack-cluster
+kind load docker-image frontend-app:latest --name fullstack-cluster
+
+📁 5. Apply Kubernetes Manifests
+
+Deploy backend + frontend (in same pod):
+
+kubectl apply -f k8s/
+
+
+Check pods:
+
+kubectl get pods
+
+
+You should see:
+
+fullstack-app-deployment-xxxxx   2/2     Running
+
+🌐 6. Access the Application
+
+Check the service:
+
+kubectl get svc
+
+
+Expected output:
+
+3000:30080/TCP  # frontend → http://localhost:30080
+5000:30081/TCP  # backend  → http://localhost:30081/api/users
+
+✅ Frontend
+
+http://localhost:30080
+
+✅ Backend API
+
+http://localhost:30081/api/users
+
+🧹 7. Cleanup
+kubectl delete -f k8s/
+kind delete cluster --name fullstack-cluster
+docker rm -f backend-container frontend-container
+docker rmi backend-app:latest frontend-app:latest
+
+🛑 Common Issues & Fixes
+Issue	Solution
+ErrImageNeverPull	Run: kind load docker-image <image>
+nodePort already allocated	Change NodePort in service.yaml
+Frontend cannot reach backend	Use correct API URL → http://localhost:30081
+YAML errors	Ensure correct indentation and list syntax
+Container name invalid	Names must be lowercase RFC1123
+📘 Kubernetes Files
+deployment.yaml
+
+Multi-container pod with frontend + backend.
+
+service.yaml
+
+NodePort exposing containers on:
+
+30080 → frontend
+
+30081 → backend
