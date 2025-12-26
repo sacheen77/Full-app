@@ -6,6 +6,7 @@ function App() {
     <div>
       <h1>Frontend React App</h1>
       <UserList />
+      <h1>HI</h1>
     </div>
   );
 }
