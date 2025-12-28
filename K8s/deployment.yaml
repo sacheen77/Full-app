@@ -14,11 +14,13 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: sacheen/frontend:latest
+          image: sacheen7/sacheen-frontend:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 80
 
         - name: backend
-          image: sacheen/backend:latest
+          image: sacheen7/sacheen-backend:latest
+          imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 5000
